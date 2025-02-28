@@ -1,0 +1,9 @@
+name: Deploy systemd-timer
+description: Deploy a systemd-timer with a specific unit file and file path
+author: HappyCamper
+tactic: PERSISTENCE
+paramdefs:
+  - name: file_path
+    type: string
+    label: File path
+    placeholder: "/etc/open*"
