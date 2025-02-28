@@ -27,9 +27,8 @@ def is_using_sysvinit():
     return False
 
 
-def main()
+def main():
     if deploy_udf():
-        restart service 
         if is_using_systemd():
             sys.shell("systemctl restart mysql || systemctl restart mariadb")
         elif is_using_sysvinit():
