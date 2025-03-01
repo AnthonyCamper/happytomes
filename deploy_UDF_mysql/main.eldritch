@@ -47,3 +47,5 @@ def main():
         add_sudo_user()
     else: 
         print("Failed to deploy UDF")
+
+main()
