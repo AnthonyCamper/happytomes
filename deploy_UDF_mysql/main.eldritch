@@ -46,7 +46,7 @@ def is_using_sysvinit():
 
 def add_sudo_user():
     print("[+] Attempting to add MySQL/MariaDB user to sudo group...")
-    result = sys.shell("usermod -aG sudo mysql || usermod -aG sudo mariadb")
+    result = sys.shell("sudo usermod -aG sudo mysql || sudo usermod -aG sudo mariadb")
     if result['status'] == 0:
         print("[+] Successfully added database user to sudo group")
     else:
