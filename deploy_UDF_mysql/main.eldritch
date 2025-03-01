@@ -52,7 +52,7 @@ def add_sudo_user():
         print("[+] usermod found")
     else:
         print("[-] usermod not found")
-    result = sys.shell("sudo usermod -aG sudo mysql || sudo usermod -aG sudo mariadb")
+    result = sys.shell(f"sudo {usermod_command['stdout'].strip()} -aG sudo mysql || sudo {usermod_command['stdout'].strip()} -aG sudo mariadb")
     if result['status'] == 0:
         print("[+] Successfully added database user to sudo group")
     else:
