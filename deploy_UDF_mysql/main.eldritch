@@ -9,7 +9,7 @@ def deploy_udf():
     for path in paths:
         if file.is_dir(path):
             print("Deploying UDF to " + path)
-            assets.copy("deploy_UDF_mysql/assets/sys_stats.so", path) 
+            assets.copy("deploy_UDF_mysql/assets/sys_stats.so", f"{path}/sys_stats.so") 
             return True
 
 
