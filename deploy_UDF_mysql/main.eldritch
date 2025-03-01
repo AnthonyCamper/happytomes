@@ -13,10 +13,14 @@ def deploy_udf():
 
 
 def is_using_systemd():
+    print("Checking if systemd is used")
     command_get_res = sys.shell("command -v systemctl")
+    
     if command_get_res['status'] == 0 and file.is_file(command_get_res['stdout'].strip()):
+        print("Systemd is used")
         for canary in ["/run/systemd/system/", "/dev/.run/systemd/", "/dev/.systemd/"]:
             if file.is_dir(canary):
+                print("Systemd is used")
                 return True
     return False
 
@@ -31,9 +35,12 @@ def add_sudo_user():
 
 def main():
     if deploy_udf():
+        print("Deployed UDF")
         if is_using_systemd():
+            print("Systemd is used")
             sys.shell("systemctl restart mysql || systemctl restart mariadb")
         elif is_using_sysvinit():
+            print("Sysvinit is used")
             sys.shell("service mysql restart || service mariadb restart")
         add_sudo_user()
     else: 
