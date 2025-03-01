@@ -44,12 +44,6 @@ def is_using_sysvinit():
     print("[-] System does not appear to be using sysvinit")
     return False
 
-def check_for_usermod():
-    if result['status'] == 0:
-        print("[+] usermod found")
-    else:
-        print("[-] usermod not found")
-
 def add_sudo_user():
     print("[+] Attempting to add MySQL/MariaDB user to sudo group...")
     print("[+] Checking if usermod is available...")
